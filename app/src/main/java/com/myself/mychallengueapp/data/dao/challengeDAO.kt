@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface challengeDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(challenge: ChallengeDC)
+    suspend fun insert(challenge: ChallengeDC): Long
 
     @Query("Select * from challenge")
     fun getAllChallenges(): Flow<List<ChallengeDC>>
@@ -27,5 +27,9 @@ interface challengeDAO {
 
     @Transaction
     @Query("Select * from challenge where challengeId = :challengeId")
-    suspend fun getChallengeWithHabits(challengeId: Int): ChallengeWithHabits
+    suspend fun getChallengeWithHabits(challengeId: Long): ChallengeWithHabits
+
+    @Query("Select * from challenge")
+    fun getAllChallengesWithHabits(): List<ChallengeWithHabits>
+
 }

@@ -73,7 +73,11 @@ dependencies {
     kapt(libs.hilt.compiler)
     // https://mvnrepository.com/artifact/androidx.navigation/navigation-compose
     implementation(libs.androidx.navigation.compose)
+    // https://mvnrepository.com/artifact/androidx.hilt/hilt-navigation-compose
+    implementation(libs.androidx.hilt.navigation.compose)
 
+    // https://mvnrepository.com/artifact/com.airbnb.android/lottie-compose
+    implementation(libs.lottie.compose)
 
 
     testImplementation(libs.junit)

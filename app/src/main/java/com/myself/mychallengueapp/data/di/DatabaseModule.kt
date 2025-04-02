@@ -3,7 +3,6 @@ package com.myself.mychallengueapp.data.di
 import android.content.Context
 import androidx.room.Room
 import com.myself.mychallengueapp.data.appDatabase
-import com.myself.mychallengueapp.data.dao.DaysOfWeekDAO
 import com.myself.mychallengueapp.data.dao.challengeDAO
 import dagger.Module
 import dagger.Provides
@@ -20,12 +19,6 @@ object DatabaseModule {
     @Provides
     fun provideChallengeDAO(database: appDatabase) : challengeDAO{
         return database.challengeDAO()
-    }
-
-    @Singleton
-    @Provides
-    fun provideDaysOfWeekDAO(database: appDatabase) : DaysOfWeekDAO {
-        return database.daysOfWeekDAO()
     }
 
     @Singleton

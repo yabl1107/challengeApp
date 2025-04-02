@@ -14,6 +14,8 @@ class habitRepository @Inject constructor(private val habitDAO: habitDAO){
     suspend fun updateHabit(habit: HabitDC) = habitDAO.update(habit)
     suspend fun deleteHabit(habit: HabitDC) = habitDAO.delete(habit)
 
-    fun getAllHabits() : Flow<List<HabitDC>> = habitDAO.getAllHabits().flowOn(Dispatchers.IO).conflate()
+    suspend fun getAllHabitsOnce(): List<HabitDC> = habitDAO.getAllHabitsOnce()
+
+    suspend fun getAllHabits() : Flow<List<HabitDC>> = habitDAO.getAllHabits().flowOn(Dispatchers.IO).conflate()
 
 }
