@@ -13,4 +13,9 @@ class habitDaysRepository  @Inject constructor(private val habitDaysDAO: habitDa
     fun getAllHabitDays() : Flow<List<Habit_Days>> = habitDaysDAO.getAllHabitDays().flowOn(
         Dispatchers.IO).conflate()
     suspend fun getHabitDaysByDayId(habitId: Int) = habitDaysDAO.getHabitDaysByDayId(habitId)
+
+    suspend fun addAllHabitDays(habitDays: List<Habit_Days>) = habitDaysDAO.insertAll(habitDays)
+
+    suspend fun deleteHabitDay(habitDay: Habit_Days) = habitDaysDAO.delete(habitDay)
+    suspend fun deleteByHabitId(habitId: Int) = habitDaysDAO.deleteByHabitId(habitId)
 }

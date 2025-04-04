@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +32,16 @@ class challengeVM @Inject constructor(private val repository: challengeRepositor
                     _challenges.value = challenges
                 }
             }
+        }
+    }
+
+    fun countChallenges(key : String):Int {
+        val size = challenges.value.size
+        val finished = challenges.value.mapNotNull{ it.endDate?.isBefore(LocalDate.now()) }.size
+        return when (key) {
+            "active" -> return finished
+            "finished" -> size-finished
+            else -> 0
         }
     }
 }

@@ -23,12 +23,18 @@ class addChallengeVM @Inject constructor(private val repository: challengeReposi
 
     fun onValue(value: String, text: String){
         when(text){
-            "reason" -> state = state.copy(reason=value)
-            "description" -> state = state.copy(description=value)
+            "reason" -> {
+                val isValid = value.isNotBlank()
+                state = state.copy(reason=value, validReason = isValid)
+            }
+            "description" -> {
+                val isValid = value.isNotBlank()
+                state = state.copy(description=value, validDescription = isValid)
+            }
         }
     }
     fun updateEndDate(localDate: LocalDate?) {
-        state = state.copy(endDate = localDate)
+        state = state.copy(endDate = localDate, validEndDate = true)
     }
 
     fun addChallenge() {
@@ -51,11 +57,41 @@ class addChallengeVM @Inject constructor(private val repository: challengeReposi
 
     fun newHabit(habit: HabitDC, selectedDays: List<Boolean>){
         val newList = state.habitList + Pair(habit, selectedDays)
-        state = state.copy(habitList = newList )
+        state = state.copy(habitList = newList , validHabits = true)
     }
 
     fun showCalendar(value : Boolean){
         state = state.copy(showCalendar = value)
     }
+
+    fun editHabit(habitPair: Pair<HabitDC, List<Boolean>>?){
+        state = state.copy(habitToEdit = habitPair)
+    }
+
+    fun editHabitAtIndex(index: Int, newHabit: HabitDC, newSelectedDays: List<Boolean>){
+        if(index in state.habitList.indices){
+            val newList = state.habitList.toMutableList()
+            newList[index] = Pair(newHabit, newSelectedDays)
+            state = state.copy(habitList = newList)
+        }
+    }
+
+    fun validateNewChallenge() :Boolean {
+
+        val isValid = state.description.isNotBlank() &&
+                state.reason.isNotBlank() &&
+                state.endDate != null &&
+                state.habitList.isNotEmpty()
+
+        state = state.copy(
+            validDescription = state.description.isNotBlank(),
+            validReason = state.reason.isNotBlank(),
+            validEndDate = state.endDate != null,
+            validHabits = state.habitList.isNotEmpty(),
+            isFormValid = isValid
+        )
+        return isValid
+    }
+
 
 }

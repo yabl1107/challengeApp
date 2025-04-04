@@ -23,7 +23,10 @@ class challengeRepository @Inject constructor(private val challengeDAO: challeng
     fun getAllChallenges(): Flow<List<ChallengeDC>> = challengeDAO.getAllChallenges().flowOn(
         Dispatchers.IO).conflate()
 
-    suspend fun getChallengeWithHabits(challengeId: Long) = challengeDAO.getChallengeWithHabits(challengeId)
+//    suspend fun getChallengeWithHabits(challengeId: Long) = challengeDAO.getChallengeWithHabits(challengeId)
+    fun getChallengeWithHabits(challengeId: Long) = challengeDAO.getChallengeWithHabits(challengeId).flowOn(
+        Dispatchers.IO).conflate()
+
 
     @Transaction
     suspend fun addChallengeWithHabits(challenge: ChallengeDC, habits: List<Pair<HabitDC, List<Habit_Days>>>) {
@@ -39,4 +42,5 @@ class challengeRepository @Inject constructor(private val challengeDAO: challeng
             habitDaysDAO.insertAll(updatedDays) // Insertar Habits con challengeId correcto
         }
     }
+
 }

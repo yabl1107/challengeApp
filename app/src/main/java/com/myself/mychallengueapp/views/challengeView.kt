@@ -54,7 +54,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun challengeView(navHostController: NavHostController, challengeVM: challengeVM = hiltViewModel()) {
 
-    Column {
+    Column (
+        modifier = Modifier
+            .padding(top = 25.dp)
+    ){
         Row (modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
@@ -65,8 +68,8 @@ fun challengeView(navHostController: NavHostController, challengeVM: challengeVM
             ){
                 LoaderDataLottie(R.raw.challenges)
             }
-            PrimaryCard(modifier = Modifier.weight(1f),10,"Active")
-            PrimaryCard(modifier = Modifier.weight(1f),10,"Finished")
+            PrimaryCard(modifier = Modifier.weight(1f),challengeVM.countChallenges("active"),"Active")
+            PrimaryCard(modifier = Modifier.weight(1f),challengeVM.countChallenges("finished"),"Finished")
         }
 
 

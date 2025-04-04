@@ -9,7 +9,16 @@ data class addChallengeState(
     val description : String = "",
     val endDate : LocalDate? =  null,
 
+    val validDescription : Boolean = true,
+    val validReason : Boolean = true,
+    val validEndDate : Boolean = true,
+    val validHabits : Boolean = true,
+
+    val isFormValid : Boolean = true,
+
+
     val habitList : List<Pair<HabitDC, List<Boolean>>> = emptyList(),
+    val habitToEdit : Pair<HabitDC, List<Boolean>>? = null,
     val isSaved : Boolean = false,
 
     val showCalendar : Boolean = false

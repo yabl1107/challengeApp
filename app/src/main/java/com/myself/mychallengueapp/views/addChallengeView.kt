@@ -2,8 +2,6 @@ package com.myself.mychallengueapp.views
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,19 +17,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -52,7 +45,6 @@ import com.myself.mychallengueapp.viewModels.addChallengeVM
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.myself.mychallengueapp.R
-import com.myself.mychallengueapp.components.DatePickerDialogExample
 import com.myself.mychallengueapp.components.DatePickerDialogExample2
 import com.myself.mychallengueapp.components.LoaderDataLottie
 import com.myself.mychallengueapp.components.NewHabitDialog
@@ -105,18 +97,31 @@ fun addChallenge(navController: NavController, addChallengeVM: addChallengeVM = 
                 label = {Text("Describe your goal")},
                 modifier = Modifier.fillMaxWidth()
             )
+            if(!state.validDescription){
+                Text(
+                    text = "This field cannot be empty",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
             spacer(10)
             Text(
                 text = "Why is this important to you?"
             )
             spacer(10)
-
             TextField(
                 value = state.reason,
                 onValueChange = {addChallengeVM.onValue(it,"reason")},
                 label = {Text("Your motivation")},
                 modifier = Modifier.fillMaxWidth()
             )
+            if(!state.validReason){
+                Text(
+                    text = "This field cannot be empty",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
             spacer(10)
             Text(
                 text = "Set a target completion date"
@@ -148,6 +153,13 @@ fun addChallenge(navController: NavController, addChallengeVM: addChallengeVM = 
                 }
 
             }
+            if(!state.validEndDate){
+                Text(
+                    text = "This field cannot be empty",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
             spacer(15)
 
             Row (modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center,verticalAlignment = Alignment.CenterVertically){
@@ -156,26 +168,38 @@ fun addChallenge(navController: NavController, addChallengeVM: addChallengeVM = 
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                 }
             }
+            if(!state.validHabits){
+                Text(
+                    text = "Add at least one habit",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
-            state.habitList.forEach { habit ->
-                habitElement(habit)
+            state.habitList.forEachIndexed { index,habit ->
+                habitElement(habit){
+                    addChallengeVM.editHabit(habit)
+                }
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
             spacer(15)
-
             Button(modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .align(Alignment.CenterHorizontally),
                 onClick = {
-                addChallengeVM.addChallenge()
-                navController.navigate(Routes.ChallengeView.route)
-            }){
+                    if(addChallengeVM.validateNewChallenge()){
+                        addChallengeVM.addChallenge()
+                        navController.navigate(Routes.ChallengeView.route)
+                    }
+                }
+            ){
                 Text(text = "Save")
                 Spacer(modifier = Modifier.width(10.dp))
                 Image(
                     painter = painterResource(id = R.drawable.save_50),
-                    contentDescription = "save_icon"
+                    contentDescription = "save_icon",
+                    colorFilter = ColorFilter.tint( MaterialTheme.colorScheme.onPrimary )
                 )
 
             }
@@ -196,6 +220,24 @@ fun addChallenge(navController: NavController, addChallengeVM: addChallengeVM = 
         )
     }
 
+    //Dialog para editar habito
+    if(state.habitToEdit!=null){
+        NewHabitDialog(
+            settedInfo = state.habitToEdit,
+            onConfirm = {habit, list ->
+                //Agregar editar funcion
+                addChallengeVM.editHabitAtIndex(state.habitList.indexOf(state.habitToEdit),habit,list)
+                addChallengeVM.editHabit(null)
+            },
+            onDismisss = {
+                addChallengeVM.editHabit(null)
+            }
+        )
+    }
+
+
+
+
     DatePickerDialogExample2(state.showCalendar,
         onDateSelected = { dateSelected ->
             addChallengeVM.updateEndDate(dateSelected)
@@ -209,6 +251,8 @@ fun addChallenge(navController: NavController, addChallengeVM: addChallengeVM = 
 
 }
 
+
+
 @Composable
 fun spacer(value : Int) {
     Spacer(modifier = Modifier.height(value.dp))
@@ -219,12 +263,14 @@ fun spacer(value : Int) {
 fun habitElemPreview() {
     val habit = HabitDC(description = "Hacer ejercicio", tipo = 0)
     val days = listOf(true,false,false,false,false,false,false)
-    habitElement(Pair(habit,days))
+    habitElement(Pair(habit,days)){
+
+    }
 }
 
 
 @Composable
-fun habitElement(habit : Pair<HabitDC,List<Boolean>>) {
+fun habitElement( habit : Pair<HabitDC,List<Boolean>>,onEditHabit : () -> Unit) {
     //val habit = HabitDC(description = "Hacer ejercicio", tipo = 0)
 
     Card (
@@ -270,7 +316,10 @@ fun habitElement(habit : Pair<HabitDC,List<Boolean>>) {
                     }
                 }
             }
-            IconButton(onClick = { /*TODO*/ },
+            IconButton(onClick = {
+            /*TODO*/
+                onEditHabit()
+            },
                 modifier = Modifier.weight(0.7f)
             ) {
                 Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")

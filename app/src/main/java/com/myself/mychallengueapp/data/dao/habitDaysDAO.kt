@@ -25,4 +25,8 @@ interface habitDaysDAO {
 
     @Delete
     suspend fun delete(habitDays: Habit_Days)
+
+    @Query("DELETE FROM habit_days WHERE habitId = :habitId")
+    suspend fun deleteByHabitId(habitId: Int)
+
 }

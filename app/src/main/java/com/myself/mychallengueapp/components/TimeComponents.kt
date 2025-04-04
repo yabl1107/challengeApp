@@ -96,8 +96,8 @@ fun DatePickerDialogExample2(
 
 
 @Composable
-fun TimeInputField(onTimeChange: (Long) -> Unit) {
-    var timeText by remember { mutableStateOf("") }
+fun TimeInputField(value : Long?, onTimeChange: (Long) -> Unit) {
+    var timeText by remember { mutableStateOf(value?.toString() ?: "") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column {
@@ -107,10 +107,9 @@ fun TimeInputField(onTimeChange: (Long) -> Unit) {
                 timeText = it
                 val minutes = it.toLongOrNull()
                 if (minutes != null && minutes > 0) {
-                    errorMessage = null
                     onTimeChange(minutes * 60 * 1000) // Convertir minutos a milisegundos
-                } else {
-                    errorMessage = "Ingresa un número válido"
+                }else{
+                    onTimeChange(0)
                 }
             },
             label = { Text("Duración (min)") },

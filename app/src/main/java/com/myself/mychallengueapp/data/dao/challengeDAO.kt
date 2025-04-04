@@ -27,7 +27,7 @@ interface challengeDAO {
 
     @Transaction
     @Query("Select * from challenge where challengeId = :challengeId")
-    suspend fun getChallengeWithHabits(challengeId: Long): ChallengeWithHabits
+    fun getChallengeWithHabits(challengeId: Long): Flow<ChallengeWithHabits>
 
     @Query("Select * from challenge")
     fun getAllChallengesWithHabits(): List<ChallengeWithHabits>

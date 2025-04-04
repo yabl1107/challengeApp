@@ -8,12 +8,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.myself.mychallengueapp.components.NewHabitDialog
 import com.myself.mychallengueapp.data.model.HabitDC
 import com.myself.mychallengueapp.viewModels.challengeDetailVM
 import com.myself.mychallengueapp.viewModels.challengeVM
@@ -26,6 +30,7 @@ fun ChallengeDetailView(
     //Text("Challenge detail view id N° ${id}")
 
     val challengeDetail by challengeDetailVM.challengeState.collectAsState()
+    var habitToEdit by remember {mutableStateOf<Pair<HabitDC,List<Boolean>>?>(null)}
 
     challengeDetail?.let {
         Column (
@@ -48,12 +53,30 @@ fun ChallengeDetailView(
                         days[habit_Days.dayId] = true
                     }
                     val arg = Pair(el.habit,days)
-                    habitElement(arg)
+                    habitElement(arg){
+                        //Agregar funcion para editar
+                        habitToEdit = arg
+                    }
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
     }
+
+    if(habitToEdit!=null){
+        NewHabitDialog(
+            settedInfo = habitToEdit,
+            onConfirm = {habit, list ->
+                //Agregar editar funcion
+                challengeDetailVM.editHabit(habit,list)
+                habitToEdit = null
+            },
+            onDismisss = {
+                habitToEdit = null
+            }
+        )
+    }
+
 
 
 }
