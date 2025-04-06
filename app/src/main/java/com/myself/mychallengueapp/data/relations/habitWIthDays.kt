@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.myself.mychallengueapp.data.model.HabitDC
 import com.myself.mychallengueapp.data.model.Habit_Days
+import com.myself.mychallengueapp.data.model.habitLogs
 
 data class habitWIthDays(
     @Embedded val habit : HabitDC,
@@ -11,5 +12,11 @@ data class habitWIthDays(
         parentColumn = "habitId",
         entityColumn = "habitId",
     )
-    val days : List<Habit_Days>
+    val days : List<Habit_Days>,
+
+    @Relation(
+    parentColumn = "habitId",
+    entityColumn = "habitId"
+    )
+    val daysLogs: List<habitLogs>
 )

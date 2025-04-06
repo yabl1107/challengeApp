@@ -107,7 +107,7 @@ fun TimeInputField(value : Long?, onTimeChange: (Long) -> Unit) {
                 timeText = it
                 val minutes = it.toLongOrNull()
                 if (minutes != null && minutes > 0) {
-                    onTimeChange(minutes * 60 * 1000) // Convertir minutos a milisegundos
+                    onTimeChange(minutes)
                 }else{
                     onTimeChange(0)
                 }

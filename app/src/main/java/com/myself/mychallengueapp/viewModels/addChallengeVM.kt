@@ -76,11 +76,19 @@ class addChallengeVM @Inject constructor(private val repository: challengeReposi
         }
     }
 
+    fun deleteHabitAtIndex(index: Int){
+        if(index in state.habitList.indices){
+            val newList = state.habitList.toMutableList()
+            newList.removeAt(index)
+            state = state.copy(habitList = newList)
+        }
+    }
+
     fun validateNewChallenge() :Boolean {
 
         val isValid = state.description.isNotBlank() &&
                 state.reason.isNotBlank() &&
-                state.endDate != null &&
+                (state.endDate != null && state.endDate!!.isAfter(LocalDate.now())) &&
                 state.habitList.isNotEmpty()
 
         state = state.copy(
@@ -92,6 +100,4 @@ class addChallengeVM @Inject constructor(private val repository: challengeReposi
         )
         return isValid
     }
-
-
 }

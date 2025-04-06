@@ -2,21 +2,28 @@ package com.myself.mychallengueapp.views
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -24,6 +31,7 @@ import androidx.compose.material3.CardDefaults
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -36,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +59,11 @@ import com.myself.mychallengueapp.components.LoaderDataLottie
 import com.myself.mychallengueapp.components.NewHabitDialog
 import com.myself.mychallengueapp.data.model.HabitDC
 import com.myself.mychallengueapp.navigation.Routes
+import com.myself.mychallengueapp.ui.theme.myLightGreen
+import me.saket.swipe.SwipeAction
+import me.saket.swipe.SwipeableActionsBox
+import java.time.LocalDate
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -134,6 +148,7 @@ fun addChallenge(navController: NavController, addChallengeVM: addChallengeVM = 
                 TextField(
                     value = state.endDate?.toString() ?: "",
                     onValueChange = {},
+                    readOnly = true,
                     label = { Text("End Date") },
                     modifier = Modifier.weight(4f),
                 )
@@ -177,9 +192,22 @@ fun addChallenge(navController: NavController, addChallengeVM: addChallengeVM = 
             }
 
             state.habitList.forEachIndexed { index,habit ->
-                habitElement(habit){
-                    addChallengeVM.editHabit(habit)
+
+                val delete = SwipeAction(
+                    icon = rememberVectorPainter(Icons.Default.Delete),
+                    background = MaterialTheme.colorScheme.error,
+                    onSwipe = {
+                        addChallengeVM.deleteHabitAtIndex(index)
+                    }
+                )
+                SwipeableActionsBox(endActions = listOf(delete), swipeThreshold = 270.dp) {
+                    habitElement(habit){
+                        addChallengeVM.editHabit(habit)
+                    }
                 }
+
+
+
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
@@ -258,45 +286,65 @@ fun spacer(value : Int) {
     Spacer(modifier = Modifier.height(value.dp))
 }
 
-@Preview(showBackground = true)
-@Composable
-fun habitElemPreview() {
-    val habit = HabitDC(description = "Hacer ejercicio", tipo = 0)
-    val days = listOf(true,false,false,false,false,false,false)
-    habitElement(Pair(habit,days)){
-
-    }
-}
 
 
 @Composable
-fun habitElement( habit : Pair<HabitDC,List<Boolean>>,onEditHabit : () -> Unit) {
-    //val habit = HabitDC(description = "Hacer ejercicio", tipo = 0)
-
+fun habitElement(
+    habit : Pair<HabitDC,List<Boolean>>,
+    progress: Float = 0f,
+    showProgress: Boolean = false,
+    nextDay : LocalDate? = null,
+    data: Triple<Int, Int, Int>? = null,
+    onEditHabit : () -> Unit) {
+    Log.d("Mendsaje desde habitElement :::: ", "Progress : ${progress} , habit : ${habit.first.description})")
     Card (
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp), // Sombra
         modifier = Modifier
     ){
         val fs = 14.sp
-        Row(modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)) {
+
+        if(showProgress)
+        {
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Text(text="${(progress*100).roundToInt()}%",
+                modifier = Modifier.align(Alignment.End).padding(end = 10.dp),
+                fontSize = 15.sp
+            )
+        }
+
+
+        if (!showProgress){
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+
+        Row(modifier = Modifier.padding(horizontal = 15.dp)) {
             Text(text = habit.first.description, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
 
-        Row (modifier = Modifier.padding(horizontal = 15.dp),
+        Row (modifier = Modifier
+            .padding(horizontal = 15.dp)
+            .height(IntrinsicSize.Min) ,
             verticalAlignment = Alignment.CenterVertically
         ){
             Column (modifier = Modifier
                 .weight(2f)
             ){
+
+                nextDay?.let {
+                    Text(text = "next: $it", fontSize = fs)
+                }
                 when(habit.first.tipo){//0 - TimeHabit , 1 - habit
                     0 -> Text(text = "Time Habit", fontSize = fs)
                     1 -> Text(text = "Task Habit", fontSize = fs)
                 }
-                if(habit.first.duration != null){
+                habit.first.duration?.let{
                     Text(text = "Duration: ${habit.first.duration}", fontSize = fs)
                 }
-                if(habit.first.timeSpecific != null){
+                habit.first.timeSpecific?.let{
                     Text(text = "Time Specific: ${habit.first.timeSpecific}", fontSize = fs)
                 }
 
@@ -304,33 +352,69 @@ fun habitElement( habit : Pair<HabitDC,List<Boolean>>,onEditHabit : () -> Unit) 
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp), horizontalArrangement = Arrangement.Start) {
-                    val days = listOf("L", "M", "M", "J", "V", "S", "D")
+                    val days = listOf("M", "T", "W", "T", "F", "S", "S")
+                    val color = if(isSystemInDarkTheme()) Color.Green else myLightGreen
                     days.forEachIndexed { index, day ->
                         Text(
                             text = day,
                             modifier = Modifier.padding(end = 8.dp),
                             fontWeight = FontWeight.Bold,
-                            color = if (selectedDays[index]) Color.Green else Color.Gray,
+                            color = if (selectedDays[index]) color else Color.Gray,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
             }
-            IconButton(onClick = {
-            /*TODO*/
-                onEditHabit()
-            },
-                modifier = Modifier.weight(0.7f)
-            ) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+
+            if(!showProgress){
+                IconButton(onClick = {
+                    /*TODO*/
+                    onEditHabit()
+                },
+                    modifier = Modifier.weight(0.7f)
+                ) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                }
+            }else{
+                Column (
+                    modifier = Modifier.weight(0.7f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ){
+                    CenteredRowItem(Color.Yellow,20,"${data?.first}")
+                    CenteredRowItem(MaterialTheme.colorScheme.error,20,"${data?.second}")
+                    CenteredRowItem(MaterialTheme.colorScheme.tertiary,20,"${data?.third}")
+                }
+
             }
+
         }
     }
+
+
+
 }
 
 
 
-
+@Composable
+fun CenteredRowItem(
+    iconColor: Color,
+    size : Int,
+    text: String
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .background(iconColor, CircleShape)
+                .size(size.dp)
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+        Text(text)
+    }
+}
 
 
 

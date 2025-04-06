@@ -11,5 +11,7 @@ import javax.inject.Inject
 class habitLogsRepository  @Inject constructor(private val habitLogsDAO: habitLogsDAO){
     suspend fun addHabitLog(habitLog: habitLogs) = habitLogsDAO.insert(habitLog)
     fun getAllHabitLogs() = habitLogsDAO.getAllHabitLogs().flowOn(Dispatchers.IO).conflate()
+    fun getHabitLogs(habitId: Int) = habitLogsDAO.getHabitLogs(habitId)
+
     suspend fun deleteHabitLog(habitId : Int, date: LocalDate) = habitLogsDAO.delete(habitId,date)
 }

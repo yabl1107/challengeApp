@@ -53,7 +53,7 @@ fun previewNewHabitDialog(){
     NewHabitDialog(
         onConfirm = { a,b ->
         }
-    ) {
+    ){
 
     }
 }
@@ -67,7 +67,6 @@ fun NewHabitDialog(settedInfo : Pair<HabitDC,List<Boolean>>? = null, onConfirm: 
     var defDays = settedInfo?.second ?: List(7) {false}
     val title = settedInfo?.let { "Edit Habit" } ?: "New Habit"
     val textBtn = settedInfo?.let { "Edit "} ?: "Add"
-
 
     var habitName by remember { mutableStateOf(defHabit.description) }
 
@@ -144,9 +143,8 @@ fun NewHabitDialog(settedInfo : Pair<HabitDC,List<Boolean>>? = null, onConfirm: 
                 if(isChecked) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
 
-                        var showMin = duration?.div(3600) ?: duration
                         TimeInputField(
-                            value = showMin,
+                            value = duration,
                             onTimeChange = {
                                 duration = it
                                 durationValid = it > 0
@@ -275,7 +273,7 @@ fun NewHabitDialog(settedInfo : Pair<HabitDC,List<Boolean>>? = null, onConfirm: 
 
 @Composable
 fun SelectableDaysRow(selectedDays : List<Boolean>, onDaySelected: (Int)->Unit) {
-    val days = listOf("L", "M", "M", "J", "V", "S", "D")
+    val days = listOf("M", "T", "W", "T", "F", "S", "S")
     Row(modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {

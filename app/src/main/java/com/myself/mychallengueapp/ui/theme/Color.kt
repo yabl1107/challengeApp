@@ -2,6 +2,7 @@ package com.myself.mychallengueapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val myLightGreen = Color(0xFF45C05D)
 val primaryLight = Color(0xFF415F91)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFD6E3FF)

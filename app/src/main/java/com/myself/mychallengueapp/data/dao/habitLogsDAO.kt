@@ -16,6 +16,9 @@ interface habitLogsDAO {
     @Query("Select * from habit_logs")
     fun getAllHabitLogs(): Flow<List<habitLogs>>
 
+    @Query("Select * from habit_logs where habitId = :habitId")
+    fun getHabitLogs(habitId: Int): List<habitLogs>
+
     @Query("Delete from habit_logs where habitId = :habitId and date = :date")
     suspend fun delete(habitId: Int, date: LocalDate)
 }

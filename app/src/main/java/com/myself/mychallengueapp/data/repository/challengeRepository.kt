@@ -11,6 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
+import java.time.LocalDate
+import java.time.LocalTime
 import javax.inject.Inject
 
 class challengeRepository @Inject constructor(private val challengeDAO: challengeDAO,
@@ -34,7 +36,9 @@ class challengeRepository @Inject constructor(private val challengeDAO: challeng
 
         //Insertar cada habito con el id correcto
         habits.forEach{ (habit,selectedDays) ->
-            val updatedHabit = habit.copy(challengeId=challengeId.toInt())
+            val startDate = if(habit.timeSpecific?.isBefore(LocalTime.now()) == true) LocalDate.now().plusDays(1)  else LocalDate.now()
+            val updatedHabit = habit.copy(challengeId=challengeId.toInt(), createdAt = startDate)
+
             val habitId = habitDAO.insert(updatedHabit)
             val updatedDays = selectedDays.map { habit_days ->
                 habit_days.copy(habitId = habitId.toInt())

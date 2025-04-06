@@ -83,7 +83,7 @@ class dayVM @Inject constructor(
             if (habitDays.dayId + 1 == date.dayOfWeek.value) habitDays.habitId else null
         }
         selectedHabits = habitList.filter { habit ->
-            habit.habitId in ids
+            habit.habitId in ids && (habit.createdAt.isBefore(date) || habit.createdAt.equals(date))
         }
     }
 
