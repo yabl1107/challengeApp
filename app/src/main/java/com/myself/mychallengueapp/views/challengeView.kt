@@ -2,6 +2,7 @@ package com.myself.mychallengueapp.views
 
 import androidx.compose.ui.graphics.Color
 import android.widget.Space
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,13 +62,18 @@ fun challengeView(navHostController: NavHostController, challengeVM: challengeVM
     ){
         Row (modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .height(120.dp)
         ){
             Box(modifier= Modifier
                 .weight(1f)
                 .height(100.dp)
             ){
-                LoaderDataLottie(R.raw.challenges)
+                //LoaderDataLottie(R.raw.challenges)
+                Image(
+                    painter = painterResource(id = R.drawable.objective),
+                    contentDescription = "objective"
+                )
             }
             PrimaryCard(modifier = Modifier.weight(1f),challengeVM.countChallenges("active"),"Active")
             PrimaryCard(modifier = Modifier.weight(1f),challengeVM.countChallenges("finished"),"Finished")

@@ -78,6 +78,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.airbnb.android/lottie-compose
     implementation(libs.lottie.compose)
+    //Datastore
+    implementation(libs.androidx.datastore.preferences)
 
 
     testImplementation(libs.junit)

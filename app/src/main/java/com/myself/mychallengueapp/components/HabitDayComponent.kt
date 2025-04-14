@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,10 +51,15 @@ fun HabitDay(
     modifier: Modifier = Modifier,
     habit: HabitDC, selectedDate: LocalDate,
     done : Boolean,
-    dayVM: dayVM
+    timeDone : Long,
+    onClickButton: (habitId: Int, description:String, b: Boolean, selectedDate: LocalDate, duration: Long?) -> Unit
 ) {
 
-    var isEnabled = (selectedDate == LocalDate.now() && (habit.timeSpecific == null || habit.timeSpecific.isAfter(LocalTime.now())))
+    val isEnabled = (
+            selectedDate == LocalDate.now()
+                    && (habit.timeSpecific == null || habit.timeSpecific.isAfter(LocalTime.now()))
+                    && !(habit.duration!=null && done)
+            )
     //var isEnabled = true
     //Tarea de hoy, Si tiene tiempo especifico despues de ahora (Aun se puede hacer)
 
@@ -71,21 +77,6 @@ fun HabitDay(
         )
         .padding(10.dp)
     ){
-        /*
-        Box (
-            contentAlignment = Alignment.TopStart,
-            modifier = Modifier.padding(0.dp).wrapContentWidth()
-        ){
-            IconButton(
-                onClick = {}
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Check",
-                    modifier = Modifier.size(15.dp)
-                )
-            }
-        }*/
 
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -103,6 +94,12 @@ fun HabitDay(
                     if (habit.tipo == 0) {
                         Text(text = "Do it for: ${habit.duration} min")
                     }
+                    if (habit.tipo == 0 && timeDone>0) {
+                        val totalSeconds = habit.duration!! * 60 - timeDone
+                        val minutes = totalSeconds / 60
+                        val seconds = totalSeconds % 60
+                        Text(text = "Remaining: ${minutes}m ${seconds}s")
+                    }
                 }
 
                 if(isEnabled)
@@ -113,7 +110,8 @@ fun HabitDay(
                     ){
                         Button(
                             enabled = (isEnabled),
-                            onClick = { dayVM.toggleHabitLog(habit.habitId, !done, selectedDate) },
+                            onClick = {
+                                onClickButton(habit.habitId,habit.description, !done, selectedDate, habit.duration)},
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (done) colors.tertiary else colors.secondary, // Verde cuando está marcado
                             ),
@@ -127,7 +125,7 @@ fun HabitDay(
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Check,
+                                imageVector = if (habit.tipo == 0) Icons.Default.PlayArrow else Icons.Default.Check,
                                 contentDescription = "Check",
                                 modifier = Modifier.size(24.dp)
                             )
@@ -142,4 +140,5 @@ fun HabitDay(
 
 
 
-            // Segundo color (Ejemplo)
+
+// Segundo color (Ejemplo)

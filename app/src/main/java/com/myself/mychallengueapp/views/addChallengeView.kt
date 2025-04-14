@@ -310,15 +310,46 @@ fun habitElement(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth(),
             )
-            Text(text="${(progress*100).roundToInt()}%",
-                modifier = Modifier.align(Alignment.End).padding(end = 10.dp),
-                fontSize = 15.sp
-            )
         }
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            //Icon
+            Box(
+                modifier = Modifier.padding(vertical = 10.dp).height(23.dp),
+                contentAlignment = Alignment.Center
+            ){
+                when(habit.first.tipo){//0 - TimeHabit , 1 - habit
+                    0 -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.clock),
+                            contentDescription = "Time Habit",
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                        )
+                    }
 
-        if (!showProgress){
-            Spacer(modifier = Modifier.height(10.dp))
+                    1 -> {
+                        Image(
+                            painter = painterResource(id = R.drawable.task_icon),
+                            contentDescription = "Task Habit",
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            if(showProgress) {
+                Text(
+                    text = "${(progress * 100).roundToInt()}%",
+                    fontSize = 15.sp
+                )
+            }
         }
 
         Row(modifier = Modifier.padding(horizontal = 15.dp)) {
@@ -337,12 +368,9 @@ fun habitElement(
                 nextDay?.let {
                     Text(text = "next: $it", fontSize = fs)
                 }
-                when(habit.first.tipo){//0 - TimeHabit , 1 - habit
-                    0 -> Text(text = "Time Habit", fontSize = fs)
-                    1 -> Text(text = "Task Habit", fontSize = fs)
-                }
+
                 habit.first.duration?.let{
-                    Text(text = "Duration: ${habit.first.duration}", fontSize = fs)
+                    Text(text = "Duration: ${habit.first.duration} min", fontSize = fs)
                 }
                 habit.first.timeSpecific?.let{
                     Text(text = "Time Specific: ${habit.first.timeSpecific}", fontSize = fs)
